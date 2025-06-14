@@ -13736,7 +13736,7 @@ echo '<h3 style="margin-top: 0 !important; color: #e74c3c !important;">Restricte
                 } else if (!allPositionLimitsOk) {
                      statusClass = 'overbudget'; // Use same style for over limit
                      statusText = 'Position limit exceeded!';
-                } else if (countMet && budgetOk && allPositionLimitsOk && minRequirementsMet) { // All conditions met
+                } else if ([countMet, budgetOk, allPositionLimitsOk, minRequirementsMet].every(Boolean)) { // All conditions met
                     statusClass = 'complete';
                     statusText = 'Team Selection Complete!';
                     isSaveDisabled = false;
