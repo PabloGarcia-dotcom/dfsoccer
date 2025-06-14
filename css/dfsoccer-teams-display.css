@@ -1,0 +1,15 @@
+.dfsoccer-teams-display table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.dfsoccer-teams-display th, .dfsoccer-teams-display td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.dfsoccer-teams-display .player-details {
+    display: table-row;
+}
+.dfsoccer-teams-display .team-row {
+    cursor: pointer;
+}

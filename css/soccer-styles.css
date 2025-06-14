@@ -1,0 +1,642 @@
+.soccercontainerlarge {
+    position: fixed !important; /* Make it stick to viewport */
+    bottom: 0 !important; /* Stick to bottom */
+    right: 0 !important; /* Stick to right */
+    width: 33vw !important; /* One third of viewport width */
+    height: auto !important;
+    z-index: 9999 !important; /* Keep it above other elements */
+}
+
+.field_for_soccercontainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    width: 100%;
+    height: 120px; /* Even more compact */
+    padding: 5px;
+    position: relative; /* Changed from absolute */
+}
+
+.card_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.card_container {
+    transform-style: flat;
+}
+.card_for_soccer {
+    width: 75px;
+    height: 75px;
+    background-color: #ee8c25;
+    clip-path: polygon(16% 20%, 35% 13%, 40% 20%, 60% 20%, 65% 13%, 86% 20%, 100% 31%, 85% 44%, 80% 40%, 80% 100%, 20% 100%, 20% 40%, 15% 44%, 0 31%);
+    opacity: 0.3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card_for_soccer.selected {
+    opacity: 1;
+}
+.player_name {
+    margin-top: 5px;
+    text-align: center;
+}
+.guifield_for_soccercontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    perspective: 1000px;
+}
+
+.guifield_for_soccercontainer {
+    position: fixed !important; /* Make it stick */
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 33vw !important;
+    height: 53vh !important; /* One third of viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 800px;
+    z-index: 9999 !important;
+    background-color: rgba(255, 255, 255, 0.9); /* Optional: adds slight background */
+}
+
+.guifield_for_soccer {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    border: 1px solid white;
+    transform: rotateX(45deg) rotateZ(0deg);
+}
+
+@media (max-width: 768px) {
+    .guifield_for_soccercontainer {
+        width: 50vw !important; /* Half width on mobile */
+    }
+    
+
+    
+    .field_for_soccercontainer {
+        height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .guifield_for_soccercontainer {
+        width: 100vw !important; /* Full width on very small screens */
+    }
+}
+
+
+input[type="submit"][name="submit_results"] {
+  position: fixed;
+  bottom: 70px;  /* Distance from bottom of viewport */
+  right: 20px;   /* Distance from right of viewport */
+  z-index: 1000; /* Ensures button appears above other content */
+  /* Optional styling */
+  padding: 10px 15px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Main container */
+.dfsoccer-fixture-and-player-selection {
+  background-color: var(--color-green-950, #052e16);
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* Headings */
+.dfsoccer-fixture-and-player-selection h2 {
+  color: #ffffff;
+  font-size: 1.25rem;
+  text-align: center;
+  margin: 1rem auto;
+  padding: 0.5rem 0;
+  font-weight: 600;
+}
+
+/* Fixture display */
+.dfsoccer-fixture-and-player-selection p.fixture-info {
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+
+.dfsoccer-fixture-and-player-selection .team-name {
+  font-weight: bold;
+  color: #1c1f1d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dfsoccer-fixture-and-player-selection .vs {
+  color: #eab308;
+  font-weight: bold;
+  margin: 0 0.5rem;
+}
+
+.dfsoccer-fixture-and-player-selection .fixture-date {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #bbf7d0;
+  background-color: rgba(22, 101, 52, 0.4);
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+}
+
+/* Countdown timer */
+.fixture-countdown {
+  background-color: var(--color-green-800, #166534);
+  padding: 0.75rem 0;
+  text-align: center;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.countdown-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.countdown-label {
+  font-weight: 500;
+  color: #ffffff;
+  margin-right: 0.5rem;
+}
+
+.countdown-units {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.countdown-unit {
+  background-color: var(--color-green-950, #052e16);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  color: #ffffff;
+}
+
+.countdown-value {
+  font-weight: bold;
+}
+
+.countdown-label-sm {
+  font-size: 0.75rem;
+  color: var(--color-green-300, #86efac);
+  margin-left: 0.25rem;
+}
+
+/* Button styles */
+.remind-btn, 
+.dfsoccer-fixture-and-player-selection input[type="submit"] {
+  background-color: var(--color-yellow-500, #eab308);
+  color: var(--color-green-950, #052e16);
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.remind-btn:hover, 
+.dfsoccer-fixture-and-player-selection input[type="submit"]:hover {
+  background-color: var(--color-yellow-400, #facc15);
+  transform: translateY(-1px);
+}
+
+.remind-btn:active, 
+.dfsoccer-fixture-and-player-selection input[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Form elements */
+.dfsoccer-fixture-and-player-selection form {
+  background-color: var(--color-green-800, #166534);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.dfsoccer-fixture-and-player-selection label {
+  color: var(--color-green-300, #86efac);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.dfsoccer-fixture-and-player-selection input[type="number"],
+.dfsoccer-fixture-and-player-selection input[type="text"] {
+  background-color: var(--color-green-950, #052e16);
+  color: white;
+  border: 1px solid var(--color-green-700, #15803d);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Player selection area */
+.player-selection {
+  margin-top: 1.5rem;
+}
+
+.player-search {
+  background-color: var(--color-green-900, #14532d);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  border: 1px solid var(--color-green-800, #166534);
+}
+
+.search-input {
+  background-color: var(--color-green-950, #052e16);
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  padding-right: 2.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  width: 100%;
+  border: 1px solid var(--color-green-700, #15803d);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input::placeholder {
+  color: var(--color-green-300, #86efac);
+  opacity: 0.8;
+}
+
+.search-input:focus {
+  border-color: var(--color-green-400, #4ade80);
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4);
+}
+
+.filter-btn {
+  background-color: transparent;
+  color: var(--color-green-200, #bbf7d0);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-green-700, #15803d);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.filter-btn:hover {
+  background-color: var(--color-green-800, #166534);
+  border-color: var(--color-green-600, #16a34a);
+  color: #ffffff;
+}
+
+.filter-btn.active {
+  background-color: var(--color-green-700, #15803d);
+  border-color: var(--color-green-500, #22c55e);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Position summary */
+.position-selection-summary {
+  background-color: var(--color-green-900, #14532d);
+  color: #ffffff;
+  margin: 0.625rem 0;
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-green-800, #166534);
+}
+
+.team-status {
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.team-complete {
+  background-color: var(--color-green-500, #22c55e);
+  border-color: var(--color-green-400, #4ade80);
+}
+
+.team-incomplete {
+  background-color: #d97706;
+  border-color: #f59e0b;
+}
+
+/* Notification messages */
+.notification-message {
+  color: #ffffff;
+  text-align: center;
+  font-size: 1rem;
+  margin: 1.5rem auto;
+  line-height: 1.6;
+  max-width: 90%;
+}
+
+/* CSS variables for consistent colors */
+:root {
+  --color-green-950: #052e16;
+  --color-green-900: #14532d;
+  --color-green-800: #166534;
+  --color-green-700: #15803d;
+  --color-green-600: #16a34a;
+  --color-green-500: #22c55e;
+  --color-green-400: #4ade80;
+  --color-green-300: #86efac;
+  --color-green-200: #bbf7d0;
+  --color-yellow-500: #eab308;
+  --color-yellow-400: #facc15;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .countdown-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .remind-btn {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  
+
+  
+  .position-selection-summary .selection-counts {
+    flex-direction: column;
+  }
+}
+
+
+
+/* Modern styling for the fantasy soccer teams display */
+.dfsoccer-teams-display {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Main table styling */
+.dfsoccer-teams-display > table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 16px;
+    margin-bottom: 20px;
+}
+
+/* Header row styling */
+.dfsoccer-teams-display th {
+    padding: 12px 16px;
+    text-align: left;
+    color: var(--color-green-300, #86efac);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    background-color: var(--color-green-800, #166534);
+    border-bottom: 2px solid var(--color-green-700, #15803d);
+}
+
+.dfsoccer-teams-display th:first-child {
+    border-top-left-radius: 8px;
+    width: 80px;
+}
+
+.dfsoccer-teams-display th:last-child {
+    border-top-right-radius: 8px;
+    width: 120px;
+    text-align: right;
+}
+
+/* Team row styling */
+.dfsoccer-teams-display .team-row {
+    background-color: #f3f4f6;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dfsoccer-teams-display .team-row:hover {
+    background-color: #e5e7eb;
+}
+
+.dfsoccer-teams-display .team-row td {
+    padding: 16px;
+    vertical-align: middle;
+    border: none;
+}
+
+.dfsoccer-teams-display .team-row td:last-child {
+    text-align: right;
+    color: var(--color-green-700, #15803d);
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+/* Position number styling */
+.dfsoccer-teams-display .team-row td:first-child {
+    position: relative;
+}
+
+.dfsoccer-teams-display .team-row td:first-child::before {
+    content: attr(data-position);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-green-700, #15803d);
+    color: #ffffff;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* Hide the actual position number text */
+.dfsoccer-teams-display .team-row td:first-child {
+    color: transparent;
+    font-size: 0;
+}
+
+/* Team name styling */
+.dfsoccer-teams-display .team-row td:nth-child(2) {
+    font-size: 1rem;
+    color: #111827;
+}
+
+/* Add "Total" label to points */
+.dfsoccer-teams-display .team-row td:last-child::before {
+    content: "Total";
+    display: block;
+    font-size: 0.75rem;
+    color: #374151;
+    font-weight: normal;
+}
+
+/* Player details styling - FIXED VERSION */
+.dfsoccer-teams-display .player-details {
+    background-color: #ffffff;
+    position: relative;
+    z-index: 1; /* Changed from -1 to ensure visibility */
+}
+
+.dfsoccer-teams-display .player-details > td {
+    padding: 0 !important;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: #ffffff;
+}
+
+/* Nested table inside player details */
+.dfsoccer-teams-display .player-details table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+/* Fix for player details display */
+.dfsoccer-teams-display .player-details[style="display: table-row;"] {
+    display: table-row !important;
+}
+
+/* Player row styling */
+.dfsoccer-teams-display .player-row td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9375rem;
+    font-weight: normal;
+    background-color: #ffffff;
+}
+
+/* Fix for player rows with colspan="2" */
+.dfsoccer-teams-display .player-row td[colspan="2"] {
+    text-align: left;
+    color: #374151;
+}
+
+.dfsoccer-teams-display .player-row:last-child td {
+    border-bottom: none;
+    padding-bottom: 16px;
+}
+
+.dfsoccer-teams-display .player-row td:last-child {
+    text-align: right;
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.9375rem;
+    width: 120px;
+    background-color: #ffffff;
+}
+
+/* Points with value styling */
+.dfsoccer-teams-display .player-row td.has-points {
+    color: var(--color-green-600, #16a34a) !important;
+}
+
+/* Toggle indicator for team rows */
+.dfsoccer-teams-display .team-row td:last-child::after {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.dfsoccer-teams-display .team-row.active td:last-child::after {
+    transform: rotate(180deg);
+}
+
+/* For screens under 640px */
+@media (max-width: 640px) {
+    .dfsoccer-teams-display .team-row td:first-child::before {
+        width: 30px;
+        height: 30px;
+        font-size: 0.875rem;
+    }
+    
+    .dfsoccer-teams-display .team-row td {
+        padding: 12px;
+    }
+    
+    .dfsoccer-teams-display .team-row td:nth-child(2) {
+        font-size: 0.9375rem;
+    }
+    
+    .dfsoccer-teams-display .team-row td:last-child {
+        font-size: 1rem;
+    }
+    
+    .dfsoccer-teams-display .player-row td {
+        padding: 8px 12px;
+    }
+}
+
+
+
+.dfsoccer-button-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

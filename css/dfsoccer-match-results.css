@@ -1,0 +1,21 @@
+#form_container, #results_container {
+    margin-bottom: 20px;
+}
+
+.player-card, .result-entry {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.player-name, .result-player-name {
+    font-weight: bold;
+}
+
+input[type="text"], input[type="number"] {
+    margin-bottom: 5px;
+}
+
+input[type="submit"] {
+    margin-top: 10px;
+}

@@ -1,0 +1,36 @@
+.dfsoccer-container {
+    color: #333;
+    margin: 0 auto;
+    text-align: center;
+}
+#dfsoccer-headline {
+    font-weight: normal;
+    letter-spacing: .125rem;
+    text-transform: uppercase;
+    font-size: 1rem; /* Adjusted size */
+}
+#dfsoccer-countdown ul {
+    padding: 0;
+    list-style: none;
+}
+#dfsoccer-countdown li {
+    display: inline-block;
+    font-size: 1em; /* Adjusted size */
+    padding: 0.667em; /* Adjusted size */
+    text-transform: uppercase;
+}
+#dfsoccer-countdown li span {
+    display: block;
+    font-size: 3rem; /* Adjusted size */
+}
+@media all and (max-width: 768px) {
+    #dfsoccer-headline {
+        font-size: calc(1rem * var(--smaller));
+    }
+    #dfsoccer-countdown li {
+        font-size: calc(0.75rem * var(--smaller));
+    }
+    #dfsoccer-countdown li span {
+        font-size: calc(2.25rem * var(--smaller));
+    }
+}

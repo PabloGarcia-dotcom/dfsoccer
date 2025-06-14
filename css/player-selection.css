@@ -1,0 +1,289 @@
+/* Player Selection Panel Styles - Reimagined with #14532d base */
+
+/* Define root variables (kept for clarity) */
+:root {
+    --color-green-950: #052e16; /* Deepest Green */
+    --color-green-900: #14532d; /* Primary Background */
+    --color-green-800: #166534; /* Slightly Lighter / Interactive Elements */
+    --color-green-700: #15803d; /* Brighter Interactive / Selected */
+    --color-green-600: #16a34a;
+    --color-green-500: #22c55e;
+    --color-green-400: #4ade80; /* Lighter Accent */
+    --color-green-300: #86efac; /* Subtle Text / Accent */
+    --color-green-200: #bbf7d0; /* Very Light Text */
+    --color-white: #ffffff;     /* Primary Text */
+    --color-accent-selected: rgba(255, 255, 255, 0.1); /* Subtle white overlay for selection */
+}
+
+.player-selection {
+    width: 100%;
+    /* Optional: Add overall background if needed, otherwise panels handle it */
+    /* background-color: var(--color-green-950); /* Example: Use deepest green for page background */
+    /* padding: 1rem; /* Example: Add padding around the component */
+}
+
+.player-search {
+    /* Use the primary dark green background */
+    background-color: var(--color-green-900);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    /* Ensure text inside is white for contrast */
+    color: var(--color-white);
+    border: 1px solid var(--color-green-800); /* Subtle border */
+}
+
+.search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.search-title {
+    font-weight: bold;
+    font-size: 1.125rem;
+    /* Inherits white color from .player-search */
+}
+
+.search-input-container {
+    position: relative;
+}
+
+.search-input {
+    /* Slightly darker background for input field for subtle depth */
+    background-color: var(--color-green-950);
+    /* White text */
+    color: var(--color-white);
+    padding: 0.5rem 0.75rem; /* Slightly more padding */
+    padding-right: 2.5rem;  /* Ensure space for icon */
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    width: 100%;
+    /* Border to distinguish from container */
+    border: 1px solid var(--color-green-700);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s; /* Smooth transition */
+}
+
+.search-input::placeholder { /* Style placeholder text */
+    color: var(--color-green-300);
+    opacity: 0.8;
+}
+
+.search-input:focus {
+    /* Use a brighter green or white outline for focus */
+    border-color: var(--color-green-400);
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4); /* Optional subtle glow */
+    outline: none; /* Remove default */
+}
+
+.search-icon {
+    position: absolute;
+    right: 0.75rem; /* Adjusted position */
+    top: 50%;
+    transform: translateY(-50%);
+    /* Use a lighter green or white for icon */
+    color: var(--color-green-300);
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none; /* Prevent icon from blocking input clicks */
+}
+
+.filter-buttons {
+    display: flex;
+    /* Use flex-start or center depending on desired alignment */
+    justify-content: flex-start;
+    gap: 0.5rem; /* Add gap between buttons */
+    margin-bottom: 1rem; /* Increased margin */
+}
+
+.filter-btn {
+    /* Base style: Darker button, perhaps outlined */
+    background-color: transparent;
+    color: var(--color-green-200); /* Lighter green for inactive text */
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem; /* Adjusted padding */
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-green-700); /* Outline */
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.filter-btn:hover {
+    /* Hover: Slightly lighter background */
+    background-color: var(--color-green-800);
+    border-color: var(--color-green-600);
+    color: var(--color-white); /* White text on hover */
+}
+
+.filter-btn.active {
+    /* Active: More prominent background and white text */
+    background-color: var(--color-green-700);
+    border-color: var(--color-green-500); /* Brighter border */
+    color: var(--color-white);
+    font-weight: 500; /* Slightly bolder */
+}
+
+.player-list {
+    /* Use the primary dark green background */
+    background-color: var(--color-green-900);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    max-height: 24rem;
+    display: flex;
+    flex-direction: column;
+    /* Ensure text inside is white by default */
+    color: var(--color-white);
+    border: 1px solid var(--color-green-800); /* Subtle border */
+}
+
+.player-list-header {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    /* Slightly lighter background for header differentiation */
+    background-color: var(--color-green-800);
+    padding: 0.75rem; /* Increased padding */
+    font-size: 0.75rem;
+    /* Use a lighter, less saturated green for header text */
+    color: var(--color-green-300);
+    text-transform: uppercase; /* Make header text uppercase */
+    letter-spacing: 0.05em; /* Add some letter spacing */
+    border-bottom: 2px solid var(--color-green-700); /* Stronger bottom border */
+}
+
+.player-list-scrollable {
+    overflow-y: auto;
+    /* Custom scrollbar styling (optional, works in WebKit browsers) */
+}
+.player-list-scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+.player-list-scrollable::-webkit-scrollbar-track {
+    background: var(--color-green-900);
+    border-radius: 0 0.5rem 0.5rem 0; /* Match container radius */
+}
+.player-list-scrollable::-webkit-scrollbar-thumb {
+    background-color: var(--color-green-700);
+    border-radius: 4px;
+    border: 2px solid var(--color-green-900); /* Creates padding around thumb */
+}
+.player-list-scrollable::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-green-600);
+}
+
+
+.player-item {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem;
+    /* Slightly lighter border between items */
+    border-bottom: 1px solid var(--color-green-800);
+    transition: background-color 0.2s;
+    cursor: pointer;
+    /* Inherits white color from .player-list */
+}
+
+.player-item:last-child {
+    border-bottom: none; /* Remove border from last item */
+}
+
+.player-item:hover {
+    /* Subtle hover effect */
+    background-color: var(--color-green-800);
+}
+
+.player-item.selected {
+    /* Use a slightly brighter green or a subtle overlay for selected */
+    background-color: var(--color-green-700); /* Brighter green */
+    /* Or use a white overlay: */
+    /* background-color: var(--color-accent-selected); */
+    /* Ensure text remains readable if using overlay */
+    /* color: var(--color-white); */
+}
+
+.player-name {
+    font-weight: 500;
+     /* Inherits white color */
+}
+
+.player-position-cell {
+    /* Use a subtle color for secondary info */
+    color: var(--color-green-300);
+    font-size: 0.8rem; /* Slightly smaller */
+}
+
+.player-price {
+    text-align: right;
+     /* Inherits white color */
+     font-weight: 500;
+}
+
+.player-points {
+    text-align: right;
+    font-weight: bold; /* Keep points bold */
+     /* Inherits white color */
+}
+
+.load-more {
+    padding: 1rem;
+    text-align: center;
+    /* Use a visible but not overpowering color */
+    color: var(--color-green-300);
+    font-size: 0.875rem;
+    background-color: var(--color-green-800); /* Match header background */
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+.load-more:hover {
+    background-color: var(--color-green-700);
+    color: var(--color-white);
+}
+
+/* For responsive layouts (no changes needed based on request) */
+@media (max-width: 768px) {
+    .player-selection {
+        width: 100%;
+        padding-left: 0;
+        margin-top: 1.5rem;
+    }
+    /* Optional: Adjust grid columns for smaller screens if needed */
+    /* .player-list-header, .player-item { grid-template-columns: repeat(2, 1fr); } */
+}
+
+/* Apply standard button style */
+.form-submit-container .button.button-primary {
+    background-color: var(--color-green-600);
+    color: var(--color-white);
+    border: 1px solid var(--color-green-700);
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.form-submit-container .button.button-primary:hover {
+    background-color: var(--color-green-500);
+    border-color: var(--color-green-400);
+    transform: translateY(-1px);
+}
+
+.form-submit-container .button.button-primary:focus {
+    outline: 2px solid var(--color-green-400);
+    outline-offset: 2px;
+}
+
+.form-submit-container .button.button-primary:active {
+    background-color: var(--color-green-700);
+    transform: translateY(0);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
