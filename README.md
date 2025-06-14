@@ -13,6 +13,9 @@ DFSoccer is a versatile WordPress plugin that transforms any event into a fantas
 It supports custom leagues, players, and fixtures, and includes features for CSV import/export and performance-based scoring. 
 Whether for major events like the Champions League or casual backyard games, DFSoccer offers comprehensive management and scoring tools.
 
+> **🎮 [Try Live Demo](https://superfantasy.net/)** - See DFSoccer in action before you install!
+
+
 ![Plugin Interface](screenshots/interface.jpg)
 *Main DFSoccer plugin dashboard showing league overview and navigation*
 
