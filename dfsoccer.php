@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: dfsoccer
-  * Plugin URI: https://superfantasy.net/
+  * Plugin URI: https://fejk.live/
  * Description: dfsoccer is a comprehensive solution for managing and customizing your own fantasy soccer leagues, clubs, and players. 
  This plugin provides a robust set of features designed to enhance your fantasy soccer experience and allow for complete customization. 
  Easily create and manage custom clubs, players, and leagues to suit your fantasy soccer needs.
@@ -1168,6 +1168,397 @@ add_action('wp_enqueue_scripts', 'dfsoccer_enqueue_scripts');
 
 
 
+function dfsoccer_display_players_for_fixtures_shortcode($atts) {
+    if (!is_user_logged_in()) {
+        return 'You need to be logged in to select players.';
+    }
+
+    $atts = shortcode_atts(array(
+        'league_id' => '0'
+    ), $atts, 'players_for_fixtures');
+
+    $league_id = intval($atts['league_id']);
+    $user_id = get_current_user_id();
+    $fixture_meta_key = 'dfsoccer_saved_fixtures_' . $league_id;
+    $player_meta_key = 'dfsoccer_selected_players_' . $league_id;
+    $budget = floatval(get_post_meta($league_id, 'dfsoccer_league_budget', true));
+
+    $saved_fixtures = get_post_meta($league_id, $fixture_meta_key, true);
+
+    if (empty($saved_fixtures)) {
+        return '';
+    }
+
+    $output = '<form id="player_selection_form" method="post">';
+    
+    // Display league budget and current price
+    $output .= '<div id="budget_info">
+                    <p>League Budget: <span id="league_budget">' . $budget . '</span></p>
+                    <p>Current Price: <span id="current_price" style="color: green;">0</span></p>
+                </div>';
+
+    if (isset($_POST['submit_players'])) {
+        $selected_players = $_POST['selected_players'] ?? [];
+        $total_cost = 0;
+
+        foreach ($selected_players as $player_id) {
+            $player_price = floatval(get_post_meta($player_id, 'dfsoccer_price', true));
+            $total_cost += $player_price;
+        }
+
+        if (count($selected_players) < 6) {
+            $output .= '<div class="error">You must select exactly six players.</div>';
+        } elseif (count($selected_players) > 6) {
+            $output .= '<div class="error">You cannot select more than six players.</div>';
+        } elseif ($total_cost > $budget) {
+            $output .= '<div class="error">You are over budget.</div>';
+        } else {
+            update_user_meta($user_id, $player_meta_key, $selected_players);
+            $output .= '<div class="success">Players selected successfully!</div>';
+        }
+    }
+
+    $output .= '<div>
+                    <input type="text" id="player_search" placeholder="Search for players...">
+                    <select id="club_filter">
+                        <option value="">All Clubs</option>';
+    $clubs = array_unique(array_merge(
+        array_column($saved_fixtures, 'home_club_id'),
+        array_column($saved_fixtures, 'away_club_id')
+    ));
+    foreach ($clubs as $club_id) {
+        $output .= '<option value="' . $club_id . '">' . get_the_title($club_id) . '</option>';
+    }
+    $output .= '    </select>
+                    <select id="position_filter">
+                        <option value="">All Positions</option>
+                        <option value="goalkeeper">Goalkeeper</option>
+                        <option value="defender">Defender</option>
+                        <option value="midfielder">Midfielder</option>
+                        <option value="attacker">Attacker</option>
+                    </select>
+                    <input type="number" id="priceFilter" placeholder="Filter by price">
+                </div>';
+    $output .= '<button id="repaginate-button" type="button" style="display:none;">Repaginate Players</button>';
+
+    // Create a container for sorted players
+    $output .= '<div id="sorted_players_container"></div>';
+
+    // Create a hidden container for the original club-based players
+    $output .= '<div id="players_container" style="display: none;">';
+    foreach ($saved_fixtures as $fixture) {
+        $home_club_id = $fixture['home_club_id'];
+        $away_club_id = $fixture['away_club_id'];
+
+        $output .= '<div class="club-players" data-club-id="' . $home_club_id . '">' . dfsoccer_list_players_by_club($home_club_id, $league_id, true, $player_meta_key, $user_id) . '</div>';
+        $output .= '<div class="club-players" data-club-id="' . $away_club_id . '">' . dfsoccer_list_players_by_club($away_club_id, $league_id, true, $player_meta_key, $user_id) . '</div>';
+    }
+    $output .= '</div>';
+
+    $output .= '<input type="submit" name="submit_players" value="Save Selections" />';
+    $output .= '</form>';
+
+    $output .= '<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("player_selection_form");
+        const searchInput = document.getElementById("player_search");
+        const clubFilter = document.getElementById("club_filter");
+        const positionFilter = document.getElementById("position_filter");
+        const priceFilter = document.getElementById("priceFilter");
+        const budget = ' . $budget . ';
+        const currentPriceElement = document.getElementById("current_price");
+        const originalPlayersContainer = document.getElementById("players_container");
+        const sortedPlayersContainer = document.getElementById("sorted_players_container");
+        const repaginateButton = document.getElementById("repaginate-button");
+        const itemsPerPage = 10;
+        let currentPage = 1;
+		
+
+
+
+        // Function to sort and display players
+        function sortAndDisplayPlayers() {
+            const playerCards = Array.from(originalPlayersContainer.querySelectorAll(".player-card"));
+            
+            // Sort players by price (highest to lowest)
+            playerCards.sort((a, b) => {
+                const priceA = parseFloat(a.querySelector("input").getAttribute("data-price"));
+                const priceB = parseFloat(b.querySelector("input").getAttribute("data-price"));
+                return priceB - priceA;
+            });
+
+            // Clear and repopulate sorted container
+            sortedPlayersContainer.innerHTML = "";
+            playerCards.forEach(card => {
+                sortedPlayersContainer.appendChild(card.cloneNode(true));
+            });
+
+            // Reattach event listeners to the cloned elements
+            sortedPlayersContainer.querySelectorAll("input[name=\'selected_players[]\']").forEach(checkbox => {
+                checkbox.addEventListener("change", updateCurrentPrice);
+            });
+        }
+
+        // Create pagination container
+        const paginationContainer = document.createElement("div");
+        paginationContainer.id = "pagination";
+        sortedPlayersContainer.after(paginationContainer);
+
+        function showPage(page) {
+            const visibleCards = sortedPlayersContainer.querySelectorAll(".player-card:not(.filtered-out)");
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            visibleCards.forEach((card, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function updatePagination() {
+            const visibleCards = sortedPlayersContainer.querySelectorAll(".player-card:not(.filtered-out)");
+            const totalPages = Math.ceil(visibleCards.length / itemsPerPage);
+
+            paginationContainer.innerHTML = "";
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement("button");
+                pageButton.textContent = i;
+                pageButton.addEventListener("click", () => {
+                    currentPage = i;
+                    showPage(currentPage);
+                    updatePagination();
+					
+                });
+                if (i === currentPage) {
+                    pageButton.disabled = true;
+                }
+                paginationContainer.appendChild(pageButton);
+            }
+
+            paginationContainer.style.display = totalPages > 1 ? "block" : "none";
+        }
+
+        function areFiltersActive() {
+            return searchInput.value !== "" || 
+                   clubFilter.value !== "" || 
+                   positionFilter.value !== "" || 
+                   priceFilter.value !== "";
+        }
+
+        function resetFilters() {
+            searchInput.value = "";
+            clubFilter.value = "";
+            positionFilter.value = "";
+            priceFilter.value = "";
+            const playerCards = sortedPlayersContainer.querySelectorAll(".player-card");
+            playerCards.forEach(card => {
+                card.style.display = "";
+                card.classList.remove("filtered-out");
+            });
+        }
+
+        repaginateButton.addEventListener("click", function() {
+            resetFilters();
+            currentPage = 1;
+            showPage(currentPage);
+            updatePagination();
+            this.style.display = "none";
+        });
+
+        form.addEventListener("submit", function(event) {
+            const selectedPlayers = document.querySelectorAll("input[name=\'selected_players[]\']:checked");
+            let totalCost = 0;
+            selectedPlayers.forEach(player => {
+                totalCost += parseFloat(player.getAttribute("data-price"));
+            });
+
+            if (totalCost > budget) {
+                event.preventDefault();
+                alert("You are over budget.");
+            }
+        });
+
+        function filterPlayers() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedClub = clubFilter.value;
+            const selectedPosition = positionFilter.value;
+
+            const playerCards = sortedPlayersContainer.querySelectorAll(".player-card");
+
+            playerCards.forEach(card => {
+                const playerName = card.querySelector(".player-name").textContent.toLowerCase();
+                const playerClub = card.getAttribute("data-club-id");
+                const playerPosition = card.getAttribute("data-position");
+
+                let matchesSearch = playerName.includes(searchTerm);
+                let matchesClub = !selectedClub || playerClub === selectedClub;
+                let matchesPosition = !selectedPosition || playerPosition === selectedPosition;
+
+                if (matchesSearch && matchesClub && matchesPosition) {
+                    card.style.display = "block";
+                    card.classList.remove("filtered-out");
+                } else {
+                    card.style.display = "none";
+                    card.classList.add("filtered-out");
+                }
+            });
+
+            if (searchTerm || priceFilter.value) {
+                clubFilter.value = "";
+                positionFilter.value = "";
+            }
+
+            if (areFiltersActive()) {
+                paginationContainer.style.display = "none";
+                repaginateButton.style.display = "block";
+            } else {
+                paginationContainer.style.display = "block";
+                repaginateButton.style.display = "none";
+                currentPage = 1;
+                showPage(currentPage);
+                updatePagination();
+            }
+        }
+
+     window.updateCurrentPrice = function() {
+
+    if (window.selectedPlayers && window.selectedPlayers.length === 0) {
+        console.log("Empty player selection detected, setting price to 0");
+        const currentPriceElement = document.getElementById("current_price");
+        if (currentPriceElement) {
+            currentPriceElement.textContent = "0.00";
+            currentPriceElement.style.color = "green";
+        }
+        window.currentTotalCost = 0;
+        return; // Exit the function early
+    }
+    // Try to determine the most recently updated player selection
+    let playerIds = [];
+    
+    // First check window.selectedPlayers (global array)
+    if (window.selectedPlayers && window.selectedPlayers.length > 0) {
+        playerIds = window.selectedPlayers;
+        console.log("Using global selectedPlayers:", playerIds);
+    } 
+else if (typeof selectedPlayers !== "undefined" && selectedPlayers.length > 0) {
+        playerIds = selectedPlayers;
+        console.log("Using local selectedPlayers:", playerIds);
+    }
+    // Last resort: get directly from checkboxes
+    else {
+const checkedBoxes = document.querySelectorAll("input[type=checkbox]:checked");
+        playerIds = Array.from(checkedBoxes).map(cb => cb.value);
+        console.log("Using checkbox state for players:", playerIds);
+    }
+    
+    // Find UI elements
+    const currentPriceElement = document.getElementById("current_price");
+    const budgetElement = document.getElementById("budget_value") || document.querySelector(".budget-amount");
+
+var budgetInput = null;
+var inputs = document.getElementsByTagName("input");
+for (var i = 0; i < inputs.length; i++) {
+    if (inputs[i].name === "league_budget") {
+        budgetInput = inputs[i];
+        break;
+    }
+}
+    let totalCost = 0;
+    
+    // Process each selected player
+    playerIds.forEach(playerId => {
+        try {
+            const playerInput = document.querySelector(`input[name="selected_players[]"][value="${playerId}"]`);
+            if (playerInput) {
+                const playerPrice = parseFloat(playerInput.getAttribute("data-price"));
+                const playerName = playerInput.getAttribute("data-name") || "Unknown player";
+                
+                if (!isNaN(playerPrice)) {
+                    console.log(`Adding player: ${playerName} (ID: ${playerId}) - Price: ${playerPrice}`);
+                    totalCost += playerPrice;
+                    console.log("Running total:", totalCost.toFixed(2));
+                }
+            }
+        } catch (error) {
+            console.error(`Error processing player ${playerId}:`, error);
+        }
+    });
+    
+    console.log("Final total cost:", totalCost.toFixed(2));
+    
+    // Update UI if elements exist
+    if (currentPriceElement) {
+        currentPriceElement.textContent = totalCost.toFixed(2);
+        
+        if (totalCost > budget) {
+            console.log("Over budget! Budget:", budget);
+            currentPriceElement.style.color = "red";
+        } else {
+            console.log("Within budget! Budget:", budget);
+            currentPriceElement.style.color = "green";
+        }
+    } else {
+        console.error("Price element not found");
+    }
+};  
+	   
+	   
+	   
+        searchInput.addEventListener("input", filterPlayers);
+        clubFilter.addEventListener("change", filterPlayers);
+        positionFilter.addEventListener("change", filterPlayers);
+
+        priceFilter.addEventListener("input", function() {
+            var filterValue = parseFloat(this.value);
+            var players = sortedPlayersContainer.querySelectorAll(".player-card");
+
+            players.forEach(function(player) {
+                var price = parseFloat(player.querySelector("input").getAttribute("data-price"));
+                if (price <= filterValue || isNaN(filterValue)) {
+                    player.style.display = "flex";
+                    player.classList.remove("filtered-out");
+                } else {
+                    player.style.display = "none";
+                    player.classList.add("filtered-out");
+                }
+            });
+
+            clubFilter.value = "";
+            positionFilter.value = "";
+
+            if (filterValue) {
+                paginationContainer.style.display = "none";
+                repaginateButton.style.display = "block";
+            } else {
+                paginationContainer.style.display = "block";
+                repaginateButton.style.display = "none";
+                currentPage = 1;
+                showPage(currentPage);
+                updatePagination();
+            }
+        });
+
+        // Initial setup
+        sortAndDisplayPlayers();
+        updateCurrentPrice();
+        showPage(currentPage);
+        updatePagination();
+		
+    });
+	
+	
+    </script>';
+	
+	
+
+    return $output;
+}
+
+add_shortcode('players_for_fixtures', 'dfsoccer_display_players_for_fixtures_shortcode');
+
 
 function dfsoccer_append_league_details($content) {
     if (is_single() && get_post_type() == 'dfsoccer_league') {
@@ -1604,6 +1995,105 @@ function dfsoccer_display_teams_shortcode($atts) {
 }
 add_shortcode('display_teams', 'dfsoccer_display_teams_shortcode');
 
+
+
+
+
+
+
+function dfsoccer_enqueue_countdown_timer_assets() {
+    if (is_singular() && has_shortcode(get_post()->post_content, 'countdown_timer')) {
+        wp_enqueue_style(
+            'dfsoccer-countdown-timer-css',
+            plugin_dir_url(__FILE__) . 'css/dfsoccer-countdown-timer.css',
+            array(),
+            '1.0.0'
+        );
+        
+        wp_enqueue_script(
+            'dfsoccer-countdown-timer-js',
+            plugin_dir_url(__FILE__) . 'js/dfsoccer-countdown-timer.js',
+            array('jquery'),
+            '1.0.0',
+            true
+        );
+
+        // Get WordPress timezone
+        $wp_timezone = wp_timezone();
+        
+        // Convert fixture time to WordPress timezone
+        $date = new DateTime('2024-08-23 15:00:00', $wp_timezone);
+        
+        wp_localize_script('dfsoccer-countdown-timer-js', 'dfsoccerCountdownData', array(
+            'firstFixtureDate' => $date->getTimestamp(),
+            'wpTimezone' => array(
+                'offset' => $wp_timezone->getOffset(new DateTime('now')),
+                'name' => wp_timezone_string()
+            )
+        ));
+    }
+}
+add_action('wp_enqueue_scripts', 'dfsoccer_enqueue_countdown_timer_assets');
+
+function dfsoccer_countdown_timer_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'league_id' => '0'
+    ), $atts, 'countdown_timer');
+    
+    $league_id = intval($atts['league_id']);
+    $fixture_meta_key = 'dfsoccer_saved_fixtures_' . $league_id;
+    $saved_fixtures = get_post_meta($league_id, $fixture_meta_key, true);
+    
+    if (empty($saved_fixtures)) {
+        return ' ';
+    }
+
+    // Get WordPress timezone
+    $wp_timezone = wp_timezone();
+    
+    // Convert fixture date to WordPress timezone
+    $fixture_date = new DateTime($saved_fixtures[0]['fixture_date'], $wp_timezone);
+    $first_fixture_date = $fixture_date->getTimestamp();
+    
+    // Get current time in WordPress timezone
+    $current_time = current_time('timestamp');
+    
+    // Calculate the time remaining
+    $time_remaining = $first_fixture_date - $current_time;
+    
+    $days = floor($time_remaining / (60 * 60 * 24));
+    $hours = floor(($time_remaining % (60 * 60 * 24)) / (60 * 60));
+    $minutes = floor(($time_remaining % (60 * 60)) / 60);
+    $seconds = $time_remaining % 60;
+
+    $countdown_timer_html = '<div class="dfsoccer-container">';
+    $countdown_timer_html .= '<h1 id="dfsoccer-headline">Time Until First Fixture:</h1>';
+    $countdown_timer_html .= '<div id="dfsoccer-countdown">';
+    $countdown_timer_html .= '<ul>';
+    $countdown_timer_html .= '<li><span id="dfsoccer-days">' . esc_html(sprintf('%02d', $days)) . '</span>days</li>';
+    $countdown_timer_html .= '<li><span id="dfsoccer-hours">' . esc_html(sprintf('%02d', $hours)) . '</span>hours</li>';
+    $countdown_timer_html .= '<li><span id="dfsoccer-minutes">' . esc_html(sprintf('%02d', $minutes)) . '</span>minutes</li>';
+    $countdown_timer_html .= '<li><span id="dfsoccer-seconds">' . esc_html(sprintf('%02d', $seconds)) . '</span>seconds</li>';
+    $countdown_timer_html .= '</ul>';
+    $countdown_timer_html .= '</div>';
+    $countdown_timer_html .= '</div>';
+
+    wp_enqueue_style('dfsoccer-countdown-timer', plugin_dir_url(__FILE__) . 'css/dfsoccer-countdown-timer.css', array(), '1.0.0');
+    wp_enqueue_script('dfsoccer-countdown-timer', plugin_dir_url(__FILE__) . 'js/dfsoccer-countdown-timer.js', array(), '1.0.0', true);
+
+    // Pass timezone information to JavaScript
+    wp_localize_script('dfsoccer-countdown-timer', 'dfsoccerCountdownData', array(
+        'leagueId' => $league_id,
+        'firstFixtureDate' => $first_fixture_date,
+        'wpTimezone' => array(
+            'offset' => $wp_timezone->getOffset(new DateTime('now')),
+            'name' => wp_timezone_string()
+        )
+    ));
+
+    return $countdown_timer_html;
+}
+add_shortcode('countdown_timer', 'dfsoccer_countdown_timer_shortcode');
 
 
 
