@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: dfsoccer
-  * Plugin URI: https://fejk.live/
+  * Plugin URI: https://superfantasy.net/
  * Description: dfsoccer is a comprehensive solution for managing and customizing your own fantasy soccer leagues, clubs, and players. 
  This plugin provides a robust set of features designed to enhance your fantasy soccer experience and allow for complete customization. 
  Easily create and manage custom clubs, players, and leagues to suit your fantasy soccer needs.
