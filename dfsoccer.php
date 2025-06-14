@@ -2702,7 +2702,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showNextPlayers(filteredPlayers); // Show the first page/batch
 
         // Show/hide load more button
-        if (loadMoreContainer && loadMoreBtn) {
+        if ([loadMoreContainer, loadMoreBtn].every(Boolean)) {
             if (visiblePlayerCount < filteredPlayers.length) {
                 loadMoreContainer.style.display = 'block';
             } else {
@@ -2791,9 +2791,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Player click event listener with improved position handling
     playerListScrollable.addEventListener('click', function(e) {
         const playerItem = e.target.closest('.player-item');
-        if (playerItem && !playerItem.classList.contains('disabled-selection')) {
+        if ([playerItem, !playerItem.classList.contains('disabled-selection')].every(Boolean)) {
             const checkbox = playerItem.querySelector('input[type="checkbox"]');
-            if (checkbox && !checkbox.disabled) {
+            if ([checkbox, !checkbox.disabled].every(Boolean)) {
                 // Get original position and normalize it
                 const originalPosition = playerItem.dataset.position;
                 console.log("Raw position value:", originalPosition);
@@ -2860,19 +2860,22 @@ document.addEventListener('DOMContentLoaded', function() {
             // Disable if:
             // 1. It's not checked AND
             // 2. Either we've hit the total limit OR the position limit for this position
-            const disableItem = !checkbox.checked && (
-                totalChecked >= MAX_SELECTIONS || 
-                (position && positionCounts[position] >= POSITION_LIMITS[position].max)
-            );
+            const disableItem = [
+    !checkbox.checked,
+    [
+        totalChecked >= MAX_SELECTIONS,
+        position ? positionCounts[position] >= POSITION_LIMITS[position].max : false
+    ].some(Boolean)
+].every(Boolean);
             
             // Apply disabled state and styling
             checkbox.disabled = disableItem;
             item.classList.toggle('disabled-selection', disableItem);
             
             // Add visual indicators for position limits
-            if (position && POSITION_LIMITS[position]) {
-                const current = positionCounts[position];
-                const max = POSITION_LIMITS[position].max;
+            if ([position, POSITION_LIMITS[position]].every(Boolean)) {
+    const current = positionCounts[position];
+    const max = POSITION_LIMITS[position].max;
                 
                 // Add a data attribute for easier styling
                 item.setAttribute('data-position-status', 
@@ -2927,7 +2930,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add an overall status message
         const totalSelected = Object.values(positionCounts).reduce((sum, count) => sum + count, 0);
-        const isComplete = totalSelected === MAX_SELECTIONS && allPositionRequirementsMet;
+        const isComplete = [totalSelected === MAX_SELECTIONS, allPositionRequirementsMet].every(Boolean);
         
         summaryHTML += `
             <div class="team-status ${isComplete ? 'team-complete' : 'team-incomplete'}">
@@ -3074,12 +3077,14 @@ document.addEventListener('DOMContentLoaded', function() {
         let needsUpdate = false;
         
         mutations.forEach(mutation => {
-            if (mutation.type === 'attributes' && 
-                mutation.attributeName === 'checked' &&
-                mutation.target.matches('input[type="checkbox"]')) {
-                needsUpdate = true;
-            }
-        });
+    if ([
+        mutation.type === 'attributes',
+        mutation.attributeName === 'checked',
+        mutation.target.matches('input[type="checkbox"]')
+    ].every(Boolean)) {
+        needsUpdate = true;
+    }
+});
         
         if (needsUpdate) {
             countPositionSelections();
